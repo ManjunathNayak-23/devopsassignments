@@ -1,0 +1,356 @@
+1Q) The script displays the user data for all users whose age falls within the specified range.
+#!/bin/bash
+
+
+#This is the default file path
+#FILEPATH="/home/chandu/Desktop/details1.csv"
+
+
+echo "enter the file path"
+read FILEPATH
+
+#check if the file exists or not
+if [ ! -f $FILEPATH ]
+then
+        echo "unable to locate file"
+        exit 1
+fi
+
+#Take input range from the user
+echo "enter the age range Eg: 20-25"
+read ageRange
+
+#seperate the lower and higher range from the input
+arr=(${ageRange//[!0-9]/ })
+
+#lr low range and hr=highrange
+lr="${arr[0]}"
+hr="${arr[1]}"
+
+#loop through the each line in a file
+while read -r line;
+do
+#check if the line age matches the criteria if yes then print the line
+        if [[ $(echo "$line" | awk -F "," '{ print $3 } ') -ge $lr && $(echo "$line" | awk -F "," '{ print $3 } ') -lt $hr ]]
+        then
+                echo $line
+        fi
+
+done <$FILEPATH
+
+
+
+
+
+output:
+enter the file path
+/home/chandu/Desktop/details1.csv
+enter the age range Eg: 20-25
+20-32
+Elly,F,30,66,124
+Gwen,F,26,64,121
+Hank,M,30,71,158
+Myra,F,23,62,98
+Page,F,31,67,135
+Quin,M,29,71,176
+Ruth,F,28,65,131
+
+###########################################################################################################################################################################################
+
+
+2Q) Write a shell script that deletes all lines containing a specified word in one or more files supplied as arguments to it?
+
+echo enter file name
+read file
+echo enter word
+read word
+echo file before removing $word:
+cat $file
+grep -v -i $word $file > test
+mv test $file
+echo file after removing $word:
+cat $file
+
+output
+
+enter file name
+/home/chandu/Desktop/eg
+enter word
+hello
+file before removing hello:
+Hello World
+Welcome
+file after removing hello:
+Welcome
+
+###########################################################################################################################################################################################
+
+
+3Q) write a shell script using arithmetic operators for adding, multiplication and subtraction of any two numbers?
+
+echo "Enter the second number"
+read b
+
+echo "Enter the operator:"
+echo -e "Addition: +\nSubtraction: -\nMultiplication: x\nDivision: /"
+read op
+
+        case $op in
+         +) c=`expr $a + $b`
+                echo "Sum of $a and $b is $c";;
+
+         -) c=`expr $a - $b`
+            echo "Difference of $a and $b is $c";;
+
+         x) c=`expr $a \* $b`
+            echo "Product of $a and $b is $c";;
+
+         /) c=`expr $a / $b`
+            echo "Division of $a and $b is $c";;
+
+         *) echo "Invalid Operator"
+            exit;;
+        esac
+
+output
+Enter the first number
+10
+Enter the second number
+20
+Enter the operator:
+Addition: +
+Subtraction: -
+Multiplication: x
+Division: /
++
+Sum of 10 and 20 is 30
+
+
+###########################################################################################################################################################################################
+
+
+
+4)This example script prompts the user to enter a month and outputs the number of days. There are three possible answers: 30 days, 31 days, 28 or 29 days for February.
+
+ #! /bin/bash
+shopt -s nocasematch
+
+echo "Enter the name of a month."
+
+read month
+
+case $month in
+
+  February)
+
+
+echo "There are 28/29 days in $month.";;
+
+  April | June | September | November)
+
+echo "There are 30 days in $month.";;
+
+  January | March | May | July | August | October | December)
+
+echo "There are 31 days in $month.";;
+
+  *)
+
+echo "Unknown month. Please check if you entered the correct month name: $month";;
+
+esac
+
+output
+
+Enter the name of a month.
+November
+There are 30 days in November.
+
+###########################################################################################################################################################################################
+
+5) Write a shell script that takes a list of file paths as input and creates a compressed archive of all the files. The script should prompt the user to specify the compression format (zip or tar), and the archive name. The script should also display the size of the original and compressed files
+
+#!/bin/bash
+
+FILEPATH="/home/chandu/Desktop/test"
+
+#echo "enter path"
+#read FILEPATH
+
+echo "Enter compression format ( ZIP or TAR )"
+read compression_format
+
+echo "Enter archive name"
+read archive_name
+
+if [ $compression_format == "zip" ]
+then
+        echo "size before compression is " 
+        du -h ../test
+        cd $FILEPATH
+        zip -r  $FILEPATH/$archive_name.zip ./
+        echo "size after compression is "
+        du -h ../test/$archive_name.zip
+
+
+elif [ $compression_format == "tar" ]
+then
+        echo "size before compression is "
+        du -h ../test
+        cd $FILEPATH
+        tar -zcvf $archive_name.tar.gz ./
+        echo "size after compression is "
+        du -h ../test/$archive_name.tar.gz
+
+fi
+
+output
+Enter compression format ( ZIP or TAR )
+tar
+Enter archive name
+mytar
+size before compression is 
+48M	../test
+./
+./50MB.bin
+./b.txt
+./c.txt
+./ind.zip
+./a.txt
+tar: .: file changed as we read it
+size after compression is 
+52K	../test/mytar.tar.gz
+
+###########################################################################################################################################################################################
+
+6) BACKUP a file if the size of the file is greather than 20mb
+
+PATH=/home/chandu/Desktop/check/
+DAYS=7
+DEPTH=1
+RUN=0
+
+#check if the dir is present or not
+
+if [ ! -d $PATH ]
+then
+        echo "dir does not exist: $PATH"
+        exit 1
+fi
+
+#Create archive folder if not present
+
+if [ ! -d $PATH/archive ]
+then
+        mkdir $PATH/archive
+fi
+
+
+#Find the list of files larger than 20MB
+
+for i in `find $PATH -maxdepth $DEPTH -type f -size +20M `
+do
+        if [ $RUN -eq 0 ]
+        then
+                gzip $i || exit 1
+                mv $i.gz $PATH/archive || exit 1
+        fi
+done
+
+output
+
+enter extension
+txt
+Backup directory already exists want to override it? yes | no
+yes
+
+
+7) Write a shell script to list all of the directory files in a directory?
+
+#! /bin/bash
+echo "enter directory name:\c"
+read dir
+if [ -d $dir ]
+then
+echo "list of files in directory"
+cd $dir
+ls -la
+else 
+ echo"No directory is present in that name"
+ fi
+
+output
+enter directory name:\c
+/home/chandu/Desktop/scripts
+list of files in directory
+total 56
+drwxrwxr-x 2 chandu chandu  4096 Feb 17 12:54 .
+drwxr-xr-x 7 chandu chandu  4096 Feb 16 22:26 ..
+-rwxrwxrwx 1 root   root     532 Feb 16 17:51 arthematic_operations.sh
+-rwxrw-r-- 1 chandu chandu  1074 Feb 17 12:53 assignmentBackup.sh
+-rwxrwxrwx 1 chandu chandu   755 Feb 16 21:05 assignments.sh
+-rw-r--r-- 1 chandu chandu 12288 Feb 16 17:00 .assignments.sh.swo
+-rwxrwxrwx 1 chandu chandu   661 Feb 17 12:49 compressfiles.sh
+-rwxrwxrwx 1 root   root     232 Feb 13 11:38 disk_space_mail.sh
+-rwxrwxrwx 1 root   root     176 Feb 12 22:23 list_directory.sh
+-rwxr--r-- 1 root   root     431 Feb 12 16:27 month.sh
+/home/chandu/Desktop/test
+
+###########################################################################################################################################################################################
+
+8) Write a simple script to install any tomcat server?
+
+
+#! /bin/bash
+
+sudo wget https://dlcdn.apache.org/tomcat/tomcat-8/v8.5.85/bin/apache-tomcat-8.5.85.tar.gz
+sudo tar xvzf apache-tomcat-8.5.85.tar.gz
+sudo mv apache-tomcat-8.5.85 tomcat8
+read command
+if [ $command == "delete" ]
+ then 
+	sudo rm -rf apache-tomcat-8.5.85.tar.gz tomcat8
+	echo "deleted successfully"
+else
+ echo "tomcat present"
+fi
+
+###########################################################################################################################################################################################
+
+9) if else and elif statements
+
+#!/bin/bash
+
+echo -n "Enter a number: "
+read VAR
+
+if [[ $VAR -gt 10 ]]
+then
+  echo "The variable is greater than 10."
+elif [[ $VAR -eq 10 ]]
+then
+  echo ""
+else
+  echo "The variable is less than 10."
+fi
+
+
+output
+Enter a number
+10
+The variable is equal to 10.
+
+
+
+###########################################################################################################################################################################################
+10. How to schedule cronjobs for running any script like backup of logs?
+
+to check cronjobs
+#crontab -l
+
+to create cronjobs
+#crontab -e
+
+* 3 * * * /home/chandu/Desktop/scripts/backuplogs.sh 
+every night 3 am the cronjob trigger the backuplogs.sh shell script
+

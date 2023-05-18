@@ -1,0 +1,8 @@
+user             = "ec2-user"
+keyname          = "working"
+private_key_path = "C:/Users/Manjunath Nayak/Downloads/working.pem"
+region           = "us-east-1"
+instance_type    = "t2.large"
+vpc_id           = "vpc-0bbecb2d23ad74da2"
+subnet_id        = "subnet-031afaa892cc49ccf"
+ami_id           = "ami-04581fbf744a7d11f"
